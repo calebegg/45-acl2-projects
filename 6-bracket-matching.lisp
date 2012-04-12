@@ -1,0 +1,11 @@
+(defun bracket-match-r (i cs)
+   (declare (xargs :measure (len cs)))
+   (cond ((< i 0) nil)
+         ((endp cs) (= i 0))
+         ((eql (first cs) #\[)
+          (bracket-match-r (1+ i) (rest cs)))
+         ((eql (first cs) #\])
+          (bracket-match-r (1- i) (rest cs)))))
+
+(defun bracket-match (str)
+   (bracket-match-r 0 (coerce str 'list)))
