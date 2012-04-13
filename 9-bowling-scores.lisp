@@ -1,0 +1,61 @@
+(in-package "ACL2")
+
+(defun compute-score (ms)
+   (if (endp (rest (rest (rest ms)))) ; last frame
+       (+ (if (eql (first ms) 'strike)
+              10
+              (first ms))
+          (cond ((eql (second ms) 'spare)
+                 (- 10 (first ms)))
+                ((eql (second ms) 'strike)
+                 10)
+                (t (second ms)))
+          (cond ((eql (third ms) 'spare)
+                 (- 10 (second ms)))
+                ((eql (third ms) 'strike)
+                 10)
+                (t (third ms))))
+       (+
+         (cond ((eql (second ms) 'spare)
+                10)
+               ((natp (first ms))
+                (first ms))
+               ((eql (first ms) 'spare)
+                (if (eql (second ms) 'strike)
+                    10
+                    (second ms)))
+               ((eql (first ms) 'strike)
+                (+ 10
+                   (if (eql (second ms) 'strike)
+                       10
+                       (second ms))
+                   (cond ((eql (third ms) 'strike)
+                          10)
+                         ((eql (third ms) 'spare)
+                          (- 10 (second ms)))
+                         (t (third ms)))))
+               (t 0))
+         (compute-score (rest ms)))))
+
+(defun bowling-score-clean (cs)
+   (if (endp cs)
+       nil
+       (cons
+         (case (first cs)
+               (#\- 0)
+               (#\1 1)
+               (#\2 2)
+               (#\3 3)
+               (#\4 4)
+               (#\5 5)
+               (#\6 6)
+               (#\7 7)
+               (#\8 8)
+               (#\9 9)
+               (#\/ 'spare)
+               (#\X 'strike)
+               (otherwise nil))
+             (bowling-score-clean (rest cs)))))
+             
+(defun bowling-score (str)
+   (compute-score (bowling-score-clean (coerce str 'list))))
