@@ -1,0 +1,11 @@
+(defun mean-r (xs)
+   (if (endp xs)
+       (mv 0 0)
+       (mv-let (m j)
+               (mean-r (rest xs))
+          (mv (+ (first xs) m) (+ j 1)))))
+
+(defun mean (xs)
+   (mv-let (n d)
+           (mean-r xs)
+      (/ n d)))
